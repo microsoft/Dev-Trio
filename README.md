@@ -2,9 +2,7 @@
 
 > **Three specialized AI agents that work as a team — with intelligent tier routing that matches AI effort to task complexity, so you never overspend on simple work or under-think the hard stuff.**
 
-![Version](https://img.shields.io/visual-studio-marketplace/v/BrianMiddendorf.dev-trio)
-![Installs](https://img.shields.io/visual-studio-marketplace/i/BrianMiddendorf.dev-trio)
-![Rating](https://img.shields.io/visual-studio-marketplace/r/BrianMiddendorf.dev-trio)
+> **VS Code Marketplace listing — coming soon.** In the meantime, install manually from the [Releases page](https://github.com/microsoft/Dev-Trio/releases) (see [Getting started](#getting-started) below).
 
 ---
 
@@ -89,9 +87,16 @@ stays high while cost stays sensible. You choose the models during setup.
 
 ## Getting started
 
-Install **Dev-Trio** from the VS Code Marketplace, open a project folder, and follow
-the setup guide that appears. For a step-by-step walkthrough, see the
-**[Quick Start Guide](docs/QUICKSTART.md)**.
+**Option 1 — VS Code Marketplace (coming soon).** The Marketplace listing is pending review. Once live, you'll be able to search for **Dev-Trio** in the Extensions panel and click Install.
+
+**Option 2 — Manual install (available now).**
+
+1. Download `dev-trio-1.1.0-marketplace.vsix` from the [Releases page](https://github.com/microsoft/Dev-Trio/releases).
+2. Install it one of two ways:
+   - **VS Code:** Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`) → **Extensions: Install from VSIX…** → select the file.
+   - **Terminal:** `code --install-extension dev-trio-1.1.0-marketplace.vsix`
+
+Then open a project folder — the setup guide appears automatically. For a step-by-step walkthrough, see the **[Quick Start Guide](docs/QUICKSTART.md)**.
 
 ---
 

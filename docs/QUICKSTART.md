@@ -23,8 +23,12 @@ That's it. Dev-Trio adds the structure; your AI assistant provides the intellige
 
 ## Step 1 — Install Dev-Trio
 
-Open VS Code, click the **Extensions** icon in the left toolbar, search for
-**Dev-Trio**, and click **Install**.
+**Option 1 — VS Code Marketplace (coming soon).** Once the listing is live, you'll open VS Code, click the **Extensions** icon in the left toolbar, search for **Dev-Trio**, and click **Install**.
+
+**Option 2 — Manual install (available now).** Download `dev-trio-1.1.0-marketplace.vsix` from the [Releases page](https://github.com/microsoft/Dev-Trio/releases), then install it:
+
+- **VS Code:** Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`) → **Extensions: Install from VSIX…** → pick the file.
+- **Terminal:** `code --install-extension dev-trio-1.1.0-marketplace.vsix`
 
 Once installed, open any project folder. The Dev-Trio setup guide opens automatically.
 
