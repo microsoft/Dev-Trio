@@ -9,6 +9,7 @@ _temp/
 Thumbs.db
 _backup/
 _temp/
+scripts/
 
 # Dev-only artifacts (keep out of the public repo)
 *.bak
