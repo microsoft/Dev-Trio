@@ -51,7 +51,7 @@ export function activate(context: vscode.ExtensionContext): void {
     vscode.commands.registerCommand('dev-trio.openSessionLog', () => openSessionLogPanel(context)),
     vscode.commands.registerCommand('dev-trio.openMemory', () => openMemoryEditor(context, 'memory')),
     vscode.commands.registerCommand('dev-trio.openRoadmap', () => openMemoryEditor(context, 'roadmap')),
-    vscode.commands.registerCommand('dev-trio.refreshProjectFiles', refreshProjectFiles),
+    vscode.commands.registerCommand('dev-trio.refreshProjectFiles', () => openUpdateProject(context)),
     vscode.commands.registerCommand('dev-trio.editProjectName', editProjectName),
     vscode.commands.registerCommand('dev-trio.resetSetup', () => resetSetup(context)),
     vscode.commands.registerCommand('dev-trio.focusSidebar', () =>
@@ -353,18 +353,6 @@ async function autodetectBackupLog(workspaceUri: vscode.Uri): Promise<void> {
   }
 }
 
-const REFRESH_PROMPT =
-  '/dev-trio: Refresh my project files. Run generateDevTrioFiles for this workspace using the ' +
-  'current extension templates. Back up each Category A file before overwriting. Preserve all ' +
-  'memory files. After completion, write the current version to .dev-trio/file-version.json.';
-
-async function refreshProjectFiles(): Promise<void> {
-  await vscode.env.clipboard.writeText(REFRESH_PROMPT);
-  await vscode.window.showInformationMessage(
-    'Dev-Trio: Refresh Project prompt copied. Paste it into GitHub Copilot Chat.'
-  );
-}
-
 async function openUpdateProject(context: vscode.ExtensionContext): Promise<void> {
   const workspaceUri = vscode.workspace.workspaceFolders?.[0]?.uri;
   if (!workspaceUri) {
@@ -381,7 +369,6 @@ async function openUpdateProject(context: vscode.ExtensionContext): Promise<void
   UpdateProjectPanel.createOrShow(context, workspaceUri, {
     fileVersion,
     extVersion: extensionVersion,
-    refreshPrompt: REFRESH_PROMPT,
     isUpToDate: isCurrentVersion,
     upgradePending: !isCurrentVersion,
     agentConfig: cfg ? { ghcp: cfg.agents.ghcp, claudeCode: cfg.agents.claudeCode, codex: cfg.agents.codex } : null,

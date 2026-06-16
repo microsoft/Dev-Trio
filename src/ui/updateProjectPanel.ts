@@ -1,7 +1,11 @@
 import * as vscode from 'vscode';
+import * as path from 'path';
 import { readAgentConfig, writeAgentConfig, AGENT_MODEL_OPTIONS, DEFAULT_AGENT_MODELS, AgentConfig, type AgentModelConfig } from '../utils/agentDetection';
 import { generateDevTrioFiles, configureGitignore, regenerateAgentModelFiles, readFileVersion } from '../init/skeletonGenerator';
 import { removeAgentFiles } from '../cleanup/workspaceCleanup';
+import { wireNotification } from '../notify/wireNotification';
+import { wireBackupLog } from '../logging/wireBackupLog';
+import { isBackupLogConfigured, resolveConfiguredLogUri } from '../logging/backupLog';
 
 type AgentFlags = { ghcp: boolean; claudeCode: boolean; codex: boolean };
 type AgentKey = 'ghcp' | 'claudeCode' | 'codex';
@@ -10,7 +14,6 @@ type AgentKey = 'ghcp' | 'claudeCode' | 'codex';
 export interface UpdateProjectData {
   fileVersion: string | null;
   extVersion: string;
-  refreshPrompt: string;
   isUpToDate: boolean;
   upgradePending: boolean;
   agentConfig: AgentFlags | null;
@@ -76,7 +79,7 @@ export class UpdateProjectPanel {
         localResourceRoots: [vscode.Uri.joinPath(context.extensionUri, 'media')]
       }
     );
-    new UpdateProjectPanel(panel, context, workspaceUri, data.refreshPrompt, {
+    new UpdateProjectPanel(panel, context, workspaceUri, {
       fileVersion: data.fileVersion,
       extVersion: data.extVersion,
       isUpToDate: data.isUpToDate,
@@ -98,7 +101,6 @@ export class UpdateProjectPanel {
     private readonly panel: vscode.WebviewPanel,
     context: vscode.ExtensionContext,
     private readonly workspaceUri: vscode.Uri,
-    private readonly refreshPrompt: string,
     view: UpdateProjectViewModel
   ) {
     this.installedVersion = vscode.extensions.getExtension(EXTENSION_ID)?.packageJSON.version ?? view.extVersion;
@@ -156,9 +158,8 @@ export class UpdateProjectPanel {
           void this.panel.webview.postMessage({ type: 'confirmCopy', card: msg.card });
         }
         break;
-      case 'copyRefreshPrompt':
-        await vscode.env.clipboard.writeText(this.refreshPrompt);
-        void this.panel.webview.postMessage({ type: 'confirmCopy', card: 'refresh' });
+      case 'refreshProjectFiles':
+        await this.handleRefreshProjectFiles();
         break;
       case 'sendToChat': {
         const mode = msg.mode === 'clipboard' ? 'clipboard' : 'auto';
@@ -277,6 +278,68 @@ export class UpdateProjectPanel {
       void this.panel.webview.postMessage({ type: 'confirmCopy', message: 'Agent removed.' });
     } catch (err) {
       void this.panel.webview.postMessage({ type: 'error', message: 'Could not remove agent: ' + (err instanceof Error ? err.message : String(err)) });
+    }
+  }
+
+  /**
+   * Refreshes the Dev-Trio scaffold files in place: regenerates from the current extension
+   * templates using the workspace's existing agent configuration (Category A files are backed up
+   * then overwritten; memory files are preserved), then re-applies notify/backup-log wiring that
+   * the Category A overwrite would otherwise reset to placeholders. Mirrors the walkthrough's
+   * generate()/reWireIntegrations() pattern. Fired by the panel's confirmed refresh action.
+   */
+  private async handleRefreshProjectFiles(): Promise<void> {
+    const cfg = await readAgentConfig(this.workspaceUri);
+    try {
+      const results = await vscode.window.withProgress(
+        { location: vscode.ProgressLocation.Notification, title: 'Dev-Trio: Refreshing project files\u2026' },
+        async () => {
+          const generated = await generateDevTrioFiles(this.workspaceUri, undefined, undefined, this.extensionUri, cfg ?? undefined);
+          await this.reWireIntegrations();
+          return generated;
+        }
+      );
+      await this.recomputeVersion();
+      void vscode.window.showInformationMessage(`Dev-Trio: Project files refreshed (${results.length} files).`);
+      void this.panel.webview.postMessage({ type: 'refreshDone' });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      void this.panel.webview.postMessage({ type: 'refreshFailed', message });
+    }
+  }
+
+  /**
+   * Re-applies previously-configured notify/backup-log wiring after a refresh restored the
+   * placeholder templates. Notification wiring is re-applied when notify.ps1 exists in the
+   * workspace root; backup-log wiring when a backup log is configured. Best-effort: a failed
+   * re-wire is swallowed so the refresh still reports success. Mirrors walkthrough.reWireIntegrations.
+   */
+  private async reWireIntegrations(): Promise<void> {
+    const projectName = path.basename(this.workspaceUri.fsPath);
+    const notifyScriptUri = vscode.Uri.joinPath(this.workspaceUri, 'notify.ps1');
+    let notifyExists = false;
+    try {
+      await vscode.workspace.fs.stat(notifyScriptUri);
+      notifyExists = true;
+    } catch {
+      notifyExists = false;
+    }
+    if (notifyExists) {
+      try {
+        await wireNotification(this.workspaceUri, notifyScriptUri.fsPath, projectName);
+      } catch {
+        // Best-effort re-wire — leave the refreshed placeholder if wiring fails.
+      }
+    }
+    try {
+      if (await isBackupLogConfigured()) {
+        const logUri = resolveConfiguredLogUri();
+        if (logUri) {
+          await wireBackupLog(this.workspaceUri, logUri.fsPath, projectName);
+        }
+      }
+    } catch {
+      // Best-effort re-wire — leave the refreshed placeholder if wiring fails.
     }
   }
 }
@@ -458,7 +521,7 @@ select option { color: var(--vscode-input-foreground); background-color: var(--v
       <i class="codicon codicon-refresh card-icon"></i>
       <div class="card-title">Refresh project files</div>
     </div>
-    <div class="card-desc">Reset your agent configuration files to the latest templates. A timestamped backup of each file will be created automatically.</div>
+    <div class="card-desc">Refresh your agent configuration files in place from the current extension templates. Runs directly &mdash; no copy-paste needed. Each replaced file is backed up first, and your project memory is preserved.</div>
     <div class="warn-block">
       <div class="warn-line warn-head">YOUR PROJECT MEMORY WILL BE PRESERVED:</div>
       <div class="warn-line">• memory/MEMORY.md</div>
@@ -640,13 +703,46 @@ function buildRefreshButton() {
     btn.disabled = true;
     btn.title = 'Refresh is disabled until your workspace is upgraded to the current Dev-Trio version.';
     host.appendChild(btn);
-  } else {
-    const btn = document.createElement('button');
-    btn.className = 'upd-btn';
-    btn.textContent = 'Copy to clipboard';
-    btn.addEventListener('click', () => vscode.postMessage({ type: 'copyRefreshPrompt' }));
-    host.appendChild(btn);
+    return;
   }
+  const btn = document.createElement('button');
+  btn.className = 'upd-btn';
+  btn.textContent = 'Refresh project files';
+  btn.addEventListener('click', showRefreshConfirm);
+  host.appendChild(btn);
+}
+
+function showRefreshConfirm() {
+  const host = document.getElementById('refreshAction');
+  host.textContent = '';
+  const row = document.createElement('div');
+  row.className = 'send-row';
+  const confirmBtn = document.createElement('button');
+  confirmBtn.className = 'upd-btn';
+  confirmBtn.textContent = 'Yes, refresh now';
+  confirmBtn.addEventListener('click', fireRefresh);
+  const cancelBtn = document.createElement('button');
+  cancelBtn.className = 'btn-secondary';
+  cancelBtn.textContent = 'Cancel';
+  cancelBtn.addEventListener('click', buildRefreshButton);
+  row.appendChild(confirmBtn);
+  row.appendChild(cancelBtn);
+  host.appendChild(row);
+  const note = document.createElement('div');
+  note.className = 'card-desc card-desc-after';
+  note.textContent = 'This overwrites your agent configuration files (each backed up first) and re-applies your notification and backup-log wiring. Your memory files are not touched. Continue?';
+  host.appendChild(note);
+}
+
+function fireRefresh() {
+  const host = document.getElementById('refreshAction');
+  host.textContent = '';
+  const btn = document.createElement('button');
+  btn.className = 'upd-btn disabled';
+  btn.textContent = 'Refreshing\u2026';
+  btn.disabled = true;
+  host.appendChild(btn);
+  vscode.postMessage({ type: 'refreshProjectFiles' });
 }
 
 function renderManageAgents() {
@@ -767,6 +863,16 @@ function showConfirm(hostId, message, rebuild) {
   setTimeout(rebuild, 3000);
 }
 
+function showRefreshFailed(message) {
+  const host = document.getElementById('refreshAction');
+  host.textContent = '';
+  const line = document.createElement('div');
+  line.className = 'check-line check-warn';
+  line.textContent = '\u2717 Refresh failed: ' + (message || 'unknown error');
+  host.appendChild(line);
+  setTimeout(buildRefreshButton, 6000);
+}
+
 gateSections();
 renderExtensionSection();
 buildGhcpButton();
@@ -792,6 +898,8 @@ window.addEventListener('message', (ev) => {
   if (m.type === 'agentConfigUpdated') { manageConfig = { ghcp: !!m.config.ghcp, claudeCode: !!m.config.claudeCode, codex: !!m.config.codex }; renderManageAgents(); return; }
   if (m.type === 'agentModelsUpdated') { if (m.agent && m.models) { manageModels[m.agent] = Object.assign({}, manageModels[m.agent], m.models); } renderManageAgents(); return; }
   if (m.type === 'error') { showManageStatus(m.message, true); return; }
+  if (m.type === 'refreshDone') { showConfirm('refreshAction', '\u2713 Project files refreshed', buildRefreshButton); return; }
+  if (m.type === 'refreshFailed') { showRefreshFailed(m.message); return; }
   if (m.type !== 'confirmCopy') { return; }
   if (m.message) { showManageStatus(m.message, false); return; }
   if (m.card === 'codex') {
@@ -800,8 +908,6 @@ window.addEventListener('message', (ev) => {
     showConfirm('ghcpAction', '\u2713 Copied \u2014 paste it into the Copilot Chat panel', buildGhcpButton);
   } else if (m.card === 'claude') {
     showConfirm('claudeAction', '\u2713 Copied \u2014 paste it into the Claude Code panel', buildClaudeButton);
-  } else if (m.card === 'refresh') {
-    showConfirm('refreshAction', '\u2713 Copied to clipboard', buildRefreshButton);
   }
 });
 </script>

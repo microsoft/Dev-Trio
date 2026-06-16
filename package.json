@@ -2,7 +2,7 @@
   "name": "dev-trio",
   "displayName": "Dev-Trio: Autonomous AI Coding Agents",
   "description": "Autonomous AI coding agent orchestration for GitHub Copilot, Claude Code, and OpenAI Codex — with session logging and credit tracking built in.",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "publisher": "BrianMiddendorf",
   "repository": {
     "type": "git",

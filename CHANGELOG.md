@@ -3,6 +3,20 @@
 All notable changes to Dev-Trio will be documented here. This project follows
 [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [1.2.0] — 2026-06-16
+
+### Changed
+- Refresh project files is now a direct extension action. Clicking "Refresh
+  project files" in the Update Project panel runs file regeneration immediately
+  with a confirmation step — no prompt is generated for copying to GHCP chat.
+  Category A files are backed up automatically before any overwrite.
+  Notification and backup log wiring is preserved after regeneration.
+
+### Fixed
+- Removed the REFRESH_PROMPT clipboard flow that referenced internal extension
+  functions GHCP could not call, replacing it with a faithful direct
+  implementation.
+
 ## [1.1.0] — 2026-06-15
 
 First public release.

@@ -91,10 +91,10 @@ stays high while cost stays sensible. You choose the models during setup.
 
 **Option 2 — Manual install (available now).**
 
-1. Download `dev-trio-1.1.0-marketplace.vsix` from the [Releases page](https://github.com/microsoft/Dev-Trio/releases).
+1. Download `dev-trio-1.2.0-marketplace.vsix` from the [Releases page](https://github.com/microsoft/Dev-Trio/releases).
 2. Install it one of two ways:
    - **VS Code:** Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`) → **Extensions: Install from VSIX…** → select the file.
-   - **Terminal:** `code --install-extension dev-trio-1.1.0-marketplace.vsix`
+   - **Terminal:** `code --install-extension dev-trio-1.2.0-marketplace.vsix`
 
 Then open a project folder — the setup guide appears automatically. For a step-by-step walkthrough, see the **[Quick Start Guide](docs/QUICKSTART.md)**.
 

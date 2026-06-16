@@ -468,7 +468,7 @@ export async function configureGitignore(
   }
 }
 
-export const CURRENT_FILE_VERSION = '1.1.0';
+export const CURRENT_FILE_VERSION = '1.2.0';
 // This constant must be manually updated with each extension release to match the
 // new version number in package.json. It represents the version of agent file
 // templates shipped with this build.
