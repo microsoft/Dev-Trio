@@ -1,0 +1,189 @@
+{
+  "name": "dev-trio",
+  "displayName": "Dev-Trio: Autonomous AI Coding Agents",
+  "description": "Autonomous AI coding agent orchestration for GitHub Copilot, Claude Code, and OpenAI Codex — with session logging and credit tracking built in.",
+  "version": "1.1.0",
+  "publisher": "BrianMiddendorf",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/microsoft/Dev-Trio.git"
+  },
+  "bugs": {
+    "url": "https://github.com/microsoft/Dev-Trio/issues"
+  },
+  "homepage": "https://github.com/microsoft/Dev-Trio#readme",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.96.0"
+  },
+  "main": "./dist/extension.js",
+  "icon": "media/icon-128.png",
+  "galleryBanner": {
+    "color": "#1A1B35",
+    "theme": "dark"
+  },
+  "categories": [
+    "AI",
+    "Other"
+  ],
+  "keywords": [
+    "ai",
+    "copilot",
+    "claude",
+    "codex",
+    "agents",
+    "autonomous",
+    "planner",
+    "session-log",
+    "multi-agent",
+    "dev-trio",
+    "github-copilot",
+    "automation"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "dev-trio.initProject",
+        "title": "Initialize Project",
+        "category": "Dev-Trio"
+      },
+      {
+        "command": "dev-trio.setupNotifications",
+        "title": "Setup Notifications",
+        "category": "Dev-Trio"
+      },
+      {
+        "command": "dev-trio.setupBackupLog",
+        "title": "Setup Chat Backup Log",
+        "category": "Dev-Trio"
+      },
+      {
+        "command": "dev-trio.openWalkthrough",
+        "title": "Open Setup Walkthrough",
+        "category": "Dev-Trio"
+      },
+      {
+        "command": "dev-trio.focusSidebar",
+        "title": "Focus Sidebar",
+        "category": "Dev-Trio"
+      },
+      {
+        "command": "dev-trio.removeFromWorkspace",
+        "title": "Remove from Workspace",
+        "category": "Dev-Trio",
+        "icon": "$(trash)"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "dev-trio-sidebar",
+          "title": "Dev-Trio",
+          "icon": "media/icon-mono.svg"
+        }
+      ]
+    },
+    "views": {
+      "dev-trio-sidebar": [
+        {
+          "id": "dev-trio.homeView",
+          "name": "Dev-Trio",
+          "type": "webview"
+        }
+      ]
+    },
+    "icons": {
+      "dev-trio-logo": {
+        "description": "Dev-Trio triad-loop mark",
+        "default": {
+          "fontPath": "./media/dev-trio-icons.ttf",
+          "fontCharacter": "\\E900"
+        }
+      }
+    },
+    "configuration": {
+      "title": "Dev-Trio",
+      "properties": {
+        "dev-trio.notifications.telegram.enabled": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Send Telegram notifications on TASK COMPLETE, ERROR, or DECISION NEEDED. The bot token and chat ID are stored only in VS Code SecretStorage — never in settings, never in the repo."
+        },
+        "dev-trio.notifications.teams.enabled": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "Send Microsoft Teams webhook notifications. The webhook URL is stored only in VS Code SecretStorage — never in settings."
+        },
+        "dev-trio.notifications.slack.enabled": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "Send Slack webhook notifications. The webhook URL is stored only in VS Code SecretStorage — never in settings."
+        },
+        "dev-trio.notifications.discord.enabled": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "Send Discord webhook notifications. The webhook URL is stored only in VS Code SecretStorage — never in settings."
+        },
+        "dev-trio.notifications.customWebhook.enabled": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "Send custom webhook notifications. The webhook URL is stored only in VS Code SecretStorage — never in settings."
+        },
+        "dev-trio.notifications.onTaskComplete": {
+          "type": "boolean",
+          "default": true,
+          "description": "Notify when a task loop completes successfully."
+        },
+        "dev-trio.notifications.onError": {
+          "type": "boolean",
+          "default": true,
+          "description": "Notify when an unresolvable error is encountered."
+        },
+        "dev-trio.notifications.onDecisionNeeded": {
+          "type": "boolean",
+          "default": true,
+          "description": "Notify when the planner needs a human decision."
+        },
+        "dev-trio.backupLog.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Append plan/implement/audit cycle entries to the backup log."
+        },
+        "dev-trio.backupLog.defaultPath": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "Absolute path to the chat backup log. Set automatically when you configure the backup log from the Dev-Trio sidebar. Leave empty to keep backup logging unconfigured — no backup file is created until you set it up."
+        },
+        "dev-trio.toolsDir": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "Absolute path for the user-profile tools directory (notify script location). Leave empty to use the default (`<home>/.dev-trio-tools`)."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "node esbuild.js",
+    "watch": "node esbuild.js --watch",
+    "package": "node esbuild.js --production",
+    "icons:build": "node scripts/build-icons.js",
+    "icons:font": "node scripts/build-glyph-font.js",
+    "vscode:prepublish": "npm run package",
+    "codicons:build": "node scripts/copy-codicons.js",
+    "test:all": "node _temp/tests/build-and-run.js && node _temp/tests/build-and-run-backuplog.js && node _temp/tests/build-and-run-notify.js && node _temp/tests/build-and-run-parsers.js && node _temp/tests/build-and-run-identity.js && node _temp/tests/build-and-run-probe.js && node _temp/tests/build-and-run-providers.js"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/vscode": "^1.96.0",
+    "@vscode/codicons": "^0.0.45",
+    "@vscode/vsce": "^3.9.2",
+    "esbuild": "^0.25.0",
+    "sharp": "^0.34.5",
+    "svg2ttf": "^6.1.0",
+    "svgpath": "^2.6.0",
+    "typescript": "^5.6.0"
+  }
+}

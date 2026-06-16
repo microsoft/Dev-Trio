@@ -1,0 +1,45 @@
+<svg width="1024" height="1024" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<linearGradient id="tile" x1="0" y1="0" x2="0" y2="1">
+  <stop offset="0" stop-color="#2B2D5C"/>
+  <stop offset="1" stop-color="#171833"/>
+</linearGradient>
+<linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
+  <stop offset="0" stop-color="#6E8BFF"/>
+  <stop offset="0.5" stop-color="#9B7BFF"/>
+  <stop offset="1" stop-color="#52E0C4"/>
+</linearGradient>
+<radialGradient id="hubGrad" cx="0.5" cy="0.4" r="0.7">
+  <stop offset="0" stop-color="#EAF0FF"/>
+  <stop offset="1" stop-color="#B9C6FF"/>
+</radialGradient>
+<radialGradient id="nodePlanner" cx="0.4" cy="0.35" r="0.8">
+  <stop offset="0" stop-color="#8FA6FF"/>
+  <stop offset="1" stop-color="#4E66E8"/>
+</radialGradient>
+<radialGradient id="nodeImpl" cx="0.4" cy="0.35" r="0.8">
+  <stop offset="0" stop-color="#67ECCB"/>
+  <stop offset="1" stop-color="#23A98B"/>
+</radialGradient>
+<radialGradient id="nodeCritic" cx="0.4" cy="0.35" r="0.8">
+  <stop offset="0" stop-color="#C49BFF"/>
+  <stop offset="1" stop-color="#7E4FE6"/>
+</radialGradient>
+</defs>
+<rect x="0" y="0" width="300" height="300" rx="64" fill="url(#tile)"/>
+<rect x="0.75" y="0.75" width="298.5" height="298.5" rx="63" fill="none" stroke="#3A3D72" stroke-width="1.5" opacity="0.7"/>
+<g transform="translate(150,150) scale(1.36) translate(-100,-100)">
+  <circle cx="100" cy="100" r="78" fill="none" stroke="url(#ringGrad)" stroke-width="8" stroke-dasharray="300 60" stroke-linecap="round" transform="rotate(-90 100 100)"/>
+  <line x1="100" y1="100" x2="100" y2="22" stroke="#9FB0FF" stroke-width="5" stroke-linecap="round" opacity="0.85"/>
+  <line x1="100" y1="100" x2="168" y2="139" stroke="#9FB0FF" stroke-width="5" stroke-linecap="round" opacity="0.85"/>
+  <line x1="100" y1="100" x2="32" y2="139" stroke="#9FB0FF" stroke-width="5" stroke-linecap="round" opacity="0.85"/>
+  <circle cx="100" cy="22" r="20" fill="url(#nodePlanner)"/>
+  <circle cx="168" cy="139" r="20" fill="url(#nodeImpl)"/>
+  <circle cx="32" cy="139" r="20" fill="url(#nodeCritic)"/>
+  <ellipse cx="94" cy="15" rx="8" ry="5" fill="#FFFFFF" opacity="0.28"/>
+  <ellipse cx="162" cy="132" rx="8" ry="5" fill="#FFFFFF" opacity="0.28"/>
+  <ellipse cx="26" cy="132" rx="8" ry="5" fill="#FFFFFF" opacity="0.28"/>
+  <circle cx="100" cy="100" r="14" fill="url(#hubGrad)"/>
+  <circle cx="100" cy="100" r="14" fill="none" stroke="#FFFFFF" stroke-width="1" opacity="0.5"/>
+</g>
+</svg>

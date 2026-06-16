@@ -1,0 +1,6 @@
+{
+  "updated": "2026-06",
+  "recommended": ["Claude Opus", "Claude Sonnet", "GPT-5.x (including Codex)", "Gemini Pro"],
+  "use_with_caution": ["Claude Haiku", "Gemini Flash", "GPT-5 mini and other 'mini' tiers"],
+  "note": "Recommended classes support Copilot agent mode with strong tool use and multi-step orchestration. Lightweight tiers are optimized for speed and may lack the orchestration depth the dev-trio relies on. This list is refreshed with each extension release."
+}

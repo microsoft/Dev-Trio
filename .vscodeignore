@@ -1,0 +1,32 @@
+.vscode/**
+.vscode-test/**
+src/**
+node_modules/**
+_temp/**
+_backup/**
+.dev-trio/**
+.claude/**
+.codex/**
+.copilot-bridge/**
+.github/**
+memory/**
+scripts/**
+docs/**
+!docs/images/**
+!docs/QUICKSTART.md
+media/gifs/.gitkeep
+# ↑ Remove this line when real GIFs are added (media/gifs/model-picker.gif + autopilot.gif)
+# The GIF files themselves ship; only the placeholder .gitkeep is excluded.
+!media/prompts/**
+AGENTS.md
+CLAUDE.md
+PUBLISHING.md
+esbuild.js
+tsconfig.json
+.gitignore
+.vscodeignore
+**/*.ts
+**/*.map
+**/*.bak
+**/.DS_Store
+**/Thumbs.db

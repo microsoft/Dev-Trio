@@ -1,0 +1,48 @@
+node_modules/
+dist/
+out/
+*.vsix
+.vscode-test/
+_temp/
+*.log
+.DS_Store
+Thumbs.db
+_backup/
+_temp/
+
+# Dev-only artifacts (keep out of the public repo)
+*.bak
+.copilot-bridge/
+.npm
+npm-debug.log*
+.vscode/settings.json
+
+.dev-trio/wizard-progress.json
+.dev-trio/credits-cache.json
+.dev-trio/hidden-entries.json
+
+# Dev-Trio scaffolded files
+# Remove entries below if your team wants to share
+# these configurations across the repo.
+
+# Agent role definitions (Claude Code)
+.claude/agents/
+.claude/commands/dt-upgrade.md
+
+# Agent role definitions (GitHub Copilot)
+copilot-instructions.md
+.github/agents/
+constraints.instructions.md
+dev-trio.prompt.md
+
+# Agent role definitions (Codex)
+.codex/agents/
+.codex/config.toml
+
+# Per-developer project memory (always keep ignored)
+memory/MEMORY.md
+memory/ROADMAP.md
+memory/PROMPT_EXAMPLES.md
+
+# Dev-Trio internal state
+.dev-trio/

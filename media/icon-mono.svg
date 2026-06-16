@@ -1,0 +1,14 @@
+<svg width="24" height="24" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+<g fill="none" stroke="currentColor" stroke-width="11" stroke-linecap="round">
+  <circle cx="100" cy="100" r="78" stroke-dasharray="300 60" transform="rotate(-90 100 100)"/>
+  <line x1="100" y1="100" x2="100" y2="22"/>
+  <line x1="100" y1="100" x2="168" y2="139"/>
+  <line x1="100" y1="100" x2="32" y2="139"/>
+</g>
+<g fill="currentColor" stroke="none">
+  <circle cx="100" cy="22" r="20"/>
+  <circle cx="168" cy="139" r="20"/>
+  <circle cx="32" cy="139" r="20"/>
+  <circle cx="100" cy="100" r="15"/>
+</g>
+</svg>
